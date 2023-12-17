@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from "../../shared/services/auth.service";
-//import { MatDialog } from '@angular/material'
+import { MatFormFieldModule } from "@angular/material/form-field";
 
 @Component({
   selector: 'app-sign-up',
