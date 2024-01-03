@@ -7,3 +7,10 @@ https://services6.arcgis.com/B4YC1JgDBly0js9x/arcgis/rest/services/sectii/Featur
 Item ID:
 9b707dc6a20b4a0d9032b4cc93b15d94
 
+const layer = new FeatureLayer({
+  portalItem: {
+    id: "9b707dc6a20b4a0d9032b4cc93b15d94"
+  }
+});
+
+map.add(layer);
