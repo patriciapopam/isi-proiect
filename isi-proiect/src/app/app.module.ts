@@ -27,6 +27,11 @@ import {
 import { MatInputModule } from '@angular/material/input';
 import { MatRippleModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
+import { HomepageComponent } from './components/homepage/homepage.component';
+
+import { EsriMapComponent } from './components/esri-map/esri-map.component';
 
 @NgModule({
   declarations: [
@@ -35,10 +40,11 @@ import { MatButtonModule } from '@angular/material/button';
     SignInComponent,
     SignUpComponent,
     VerifyEmailComponent,
-    ForgotPasswordComponent
+    ForgotPasswordComponent,
+    HomepageComponent,
+    EsriMapComponent,
   ],
   imports: [
-    
     BrowserModule,
     AppRoutingModule,
     
@@ -52,7 +58,9 @@ import { MatButtonModule } from '@angular/material/button';
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
-    MatRippleModule,  
+    MatRippleModule,
+    MatToolbarModule,
+    MatIconModule,
   ],
   exports: [
     MatButtonModule,
