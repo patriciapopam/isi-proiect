@@ -3,38 +3,16 @@ import {
   OnInit,
   ViewChild,
   ElementRef,
-  Input,
   Output,
   EventEmitter,
   OnDestroy,
-  Renderer2,
-  AfterViewInit,
-  Inject
 } from "@angular/core";
 
 import Config from '@arcgis/core/config';
+import Search from '@arcgis/core/widgets/Search';
 import WebMap from '@arcgis/core/WebMap';
 import MapView from '@arcgis/core/views/MapView';
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils";
-
-import Bookmarks from '@arcgis/core/widgets/Bookmarks';
-import Expand from '@arcgis/core/widgets/Expand';
-
-import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
-import Graphic from '@arcgis/core/Graphic';
-import Point from '@arcgis/core/geometry/Point';
-import Polygon from '@arcgis/core/geometry/Polygon';
-
-import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
-import VectorTileLayer from '@arcgis/core/layers/VectorTileLayer';
-
-
-import Locate from "@arcgis/core/widgets/Locate";
-import Track from "@arcgis/core/widgets/Track";
-
-import FeatureSet from '@arcgis/core/rest/support/FeatureSet';
-import RouteParameters from '@arcgis/core/rest/support/RouteParameters';
-import * as route from "@arcgis/core/rest/route.js";
 
 import * as locator from "@arcgis/core/rest/locator.js";
 
@@ -56,11 +34,12 @@ export class EsriMapComponent implements OnInit, OnDestroy {
   graphicsLayer!: esri.GraphicsLayer;
   locator!: locator;
   reactiveUtils!: reactiveUtils;
+  searchWidget!: Search;
   
   // Attributes
   zoom = 10;
   center: Array<number> = [26.06, 44.45];
-  basemap = "streets-vector";
+  basemap = "arcgis/navigation";
   loaded = false;
   pointCoords: number[] = [26.06, 44.45];
   dir: number = 0;
@@ -70,9 +49,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
   constructor() { }
 
   async initializeMap() { 
-
     try {
-
       const mapProperties: esri.WebMapProperties = {
         basemap: this.basemap
       };
@@ -89,21 +66,14 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       };
 
       this.view = new MapView(mapViewProperties);
-
-      this.view.on('pointer-move', ["Shift"], (event) => {
-        let point = this.view.toMap({ x: event.x, y: event.y });
-        console.log("map moved: ", point.longitude, point.latitude);
-      });
+      this.searchWidget = new Search({ view: this.view });
+      this.view.ui.add(this.searchWidget, "top-right");
 
       await this.view.when(); // wait for map to load
       console.log("ArcGIS map loaded");
 
-      //console.log(this.view.center);
-      //return this.view;
-
     } catch (error) {
       console.log("EsriLoader: ", error);
-      //return null;
     }
 
   }
