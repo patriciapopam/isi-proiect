@@ -14,6 +14,10 @@ import WebMap from '@arcgis/core/WebMap';
 import MapView from '@arcgis/core/views/MapView';
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils";
 
+import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
+import PopupTemplate from "@arcgis/core/PopupTemplate.js";
+import ActionButton from "@arcgis/core/support/actions/ActionButton.js";
+
 import * as locator from "@arcgis/core/rest/locator.js";
 
 import esri = __esri; // Esri TypeScript Types
@@ -54,9 +58,11 @@ export class EsriMapComponent implements OnInit, OnDestroy {
         basemap: this.basemap
       };
 
-      Config.apiKey = "AAPKd74389863643403b89ce87e1504d639awQCjsgObn5bWJAbaVzD76umKlUIMdq45IrxoG3rf2ZdDupjUIsNZRZBSqOSGa8Dw";
+      Config.apiKey = "AAPK675199c30ad74b75a1c18cb1f33bac10zmARCb4N6A3ck9SvUrku5tnVYtm34vZOEtxf_cpnLNgIH5ASWBZ4XU4MpdvnEUqX";
 
       this.map = new WebMap(mapProperties);
+      
+      this.addFeatureLayers();
 
       const mapViewProperties = {
         container: this.mapViewEl.nativeElement,
@@ -76,6 +82,37 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       console.log("EsriLoader: ", error);
     }
 
+  }
+
+  addFeatureLayers() {
+
+    const getToLocationAction = new ActionButton({
+      title: "Get to Location",
+      id: "getToLocation",
+      //type: "button"
+      //image: "Measure_Distance16.png"
+    });
+    
+    const popupVotingCenters = new PopupTemplate ({
+      // autocasts as new PopupTemplate()
+      //actions: [measureThisAction],
+      actions: [getToLocationAction],
+      title: "Voting Center",
+      //content: "{name}",
+    });
+
+    // Trailheads feature layer (points)
+    var votingCentersLayer: esri.FeatureLayer = new FeatureLayer({
+      portalItem: {
+        id: "9b707dc6a20b4a0d9032b4cc93b15d94"
+      },
+        //outFields: ["TRL_NAME","CITY_JUR","X_STREET","PARKING","ELEV_FT"],
+        popupTemplate: popupVotingCenters
+    });
+
+    this.map.add(votingCentersLayer);
+
+    console.log("feature layers added");
   }
 
   ngOnInit(): void {
