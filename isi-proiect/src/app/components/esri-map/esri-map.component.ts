@@ -89,15 +89,15 @@ export class EsriMapComponent implements OnInit, OnDestroy {
 
       this.view = new MapView(mapViewProperties);
 
-      this.featureLayer();
+      // this.featureLayer();
 
-      this.searchWidget = new Search({ view: this.view });
-      this.view.ui.add(this.searchWidget, "top-right");
+      // this.searchWidget = new Search({ view: this.view });
+      // this.view.ui.add(this.searchWidget, "top-right");
       // this.searchWidget.on("select-result", (event: any) => {
       //   this.searchResGraphic = event.result;
       // });
 
-      const localSymbol = {
+      const locateSymbol = {
         type: "simple-marker",
         size: "12px",
         color: "blue",
@@ -109,7 +109,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       this.locate = new Locate({
         view: this.view,
         graphic: new Graphic({
-          symbol: localSymbol
+          symbol: locateSymbol
         }),
       });
       
