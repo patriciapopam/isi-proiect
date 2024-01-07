@@ -28,7 +28,12 @@ import RouteParameters from '@arcgis/core/rest/support/RouteParameters';
 import * as route from "@arcgis/core/rest/route.js";
 import Locate from "@arcgis/core/widgets/Locate.js";
 
+import Point from '@arcgis/core/geometry/Point';
 import * as locator from "@arcgis/core/rest/locator.js";
+import { Subscription } from "rxjs";
+import { FirebaseService} from "src/app/shared/services/database/firebase.service";
+
+
 
 import esri = __esri; // Esri TypeScript Types
 
@@ -49,6 +54,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
   locator!: locator;
   reactiveUtils!: reactiveUtils;
   searchWidget!: Search;
+  featureLayer!: FeatureLayer;
   searchResGraphic!: esri.Graphic;
   votingCenterGraphic!: esri.Graphic;
   centersLayer!: esri.FeatureLayer;
@@ -64,8 +70,15 @@ export class EsriMapComponent implements OnInit, OnDestroy {
   dir: number = 0;
   count: number = 0;
   timeoutHandler = null;
+  voting_places_number: number = 41;
 
-  constructor() { }
+  // firebase sync
+  subscriptionList!: Subscription;
+  subscriptionObj!: Subscription;
+
+  constructor(
+    private fbs: FirebaseService,
+  ) { }
 
   async initializeMap() { 
     try {
@@ -150,33 +163,8 @@ export class EsriMapComponent implements OnInit, OnDestroy {
     this.view.ui.add(this.searchWidget, "top-right");
   }
 
-  featureLayer(): void {
-    /*var sectionLayer: esri.FeatureLayer = new FeatureLayer({
-      url:
-        "https://services6.arcgis.com/B4YC1JgDBly0js9x/arcgis/rest/services/sectii/FeatureServer"
-    });
-    this.map.add(sectionLayer);
-    */
+  addFeatureLayer(): void 
 
-    /*
-    const layer = new FeatureLayer({
-      portalItem: {
-        id: "9b707dc6a20b4a0d9032b4cc93b15d94"
-      },
-      outFields: ["Name", "Address", "Current_no_votants"],
-      popupTemplate: popupSection
-    });
-    
-    this.map.add(layer);
-    */
-
-    /*
-    var sectionLayer: esri.FeatureLayer = new FeatureLayer({
-      url:
-        "https://services6.arcgis.com/N9xJwkvdyW8qjXA7/arcgis/rest/services/Sections/FeatureServer"
-    });
-    this.map.add(sectionLayer);
-    */
 
     const getToLocationAction = new ActionButton({
       title: "Generează ruta",
@@ -199,7 +187,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
         yoffset: 0,
         angle: 0
       })
-    });    
+    });
 
     const layer = new FeatureLayer({
       portalItem: {
@@ -211,63 +199,55 @@ export class EsriMapComponent implements OnInit, OnDestroy {
     });
     
     this.map.add(layer);
-
+    this.featureLayer = layer;
     this.centersLayer = layer;
+}
+  updateArcgisFeatureLayer(places: any[]): void {
+    for (let place of places) {
+      this.updateFeatureLayerElement(place.id, place.current_no_votants, place.total_votes);
+    }
+  }
 
-    /*
-    const query = layer.createQuery();
-    query.objectIds = [1];
-    query.outFields = [ "*" ];
-    
-    layer.queryFeatures(query).then((featureSet: { features: string | any[]; }) => {
-      if (featureSet.features.length === 0) {
-        return;
-      }
-      // now update the desire attribute
-      const feature = featureSet.features[0];
-      console.log(featureSet.features[0].attributes.Current_no_votants);
-      //console.log(feature.attributes);
-      feature.attributes.Current_no_votants = 111;
-      layer.applyEdits(
-        feature,
-        undefined,
-      );
-    });*/
 
+   
+  /* Updates one element, by id, from argcis feature layer*/
+  updateFeatureLayerElement(id: number, no_of_votants: number, new_votes: number): void {
     const feature = new Graphic({
       attributes: {
-        OBJECTID: 1,
-        Current_no_votants: 111
+        OBJECTID: id,
+        Current_no_votants: no_of_votants,
+        Total_no_votes: new_votes
       }
     });
 
-    /*
-    {
-      addFeatures: Graphic[]|Collection<Graphic>
-      updateFeatures: Graphic[]|Collection<Graphic>
-      deleteFeatures: Graphic[]|Collection<Graphic>|Object[]
-      addAttachments: AttachmentEdit[]
-      updateAttachments: AttachmentEdit[]
-      deleteAttachments: String[]  
-    }*/
-
-
-      layer.applyEdits({ updateFeatures: [feature] }).then((editsResult) => {
-          console.log(editsResult);
-      });
-  
-
-    /*
-    const graphicsLayer = new GraphicsLayer();
-    layer.queryFeatures().then((result) => {
-      result.features.forEach((feature) => {
-        graphicsLayer.add(feature.clone());
-      });
+    this.featureLayer.applyEdits({ updateFeatures: [feature] }).then((editsResult) => {
+        console.log(editsResult);
     });
+  }
 
-    this.map.add(graphicsLayer);
-    */
-  } 
+  connectFirebase() {
+    this.fbs.connectToDatabase();
+    // Get all places from ARCGIS and add them to FB
+    for (let i = 1; i < this.voting_places_number; i++) {
+      const query = this.featureLayer.createQuery();
+      query.objectIds = [i];
+      query.outFields = [ "*" ];
+      
+      this.featureLayer.queryFeatures(query).then((featureSet: { features: string | any[]; }) => {
+        if (featureSet.features.length === 0) {
+          return;
+        }
+        const feature = featureSet.features[0];
+        let name = featureSet.features[0].attributes.Name;
+        let lat = featureSet.features[0].geometry.latitude;
+        let lng = featureSet.features[0].geometry.longitude;
+        let total_votes = featureSet.features[0].attributes.Total_no_votes;
+        let current_no_votants = featureSet.features[0].attributes.Current_no_votants;
+        this.fbs.addPlaceItem(i, lat, lng, name, total_votes, current_no_votants);
+      });
+    }
+    console.log("Firebase connected");
+  }
 
   getToLocation() {
 
@@ -370,6 +350,8 @@ export class EsriMapComponent implements OnInit, OnDestroy {
     });
   }
     
+
+
   ngOnInit(): void {
     // Initialize MapView and return an instance of MapView
     this.initializeMap().then(() => {
@@ -378,8 +360,16 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       this.loaded = this.view.ready;
       this.mapLoadedEvent.emit(true);
       this.search();
-      this.featureLayer();
+      this.addFeatureLayer();
+      this.connectFirebase();
+      // Listen to firebase changes and update Arcgis remote feature layer
+      this.fbs.getFeedPlaces().subscribe(data => {
+        console.log(data);
+        this.updateArcgisFeatureLayer(data);
+      });
     });
+
+
   }
 
   ngOnDestroy(): void {
