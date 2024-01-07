@@ -656,7 +656,8 @@ export class EsriMapComponent implements OnInit, OnDestroy {
         stops: new FeatureSet({
           features: this.view.graphics.toArray()
         }),
-        returnDirections: true
+        returnDirections: true,
+        directionsLanguage: "en"
       });
 
       console.log("bbb");
@@ -679,9 +680,19 @@ export class EsriMapComponent implements OnInit, OnDestroy {
 
         // Display directions
         if (data.routeResults.length > 0) {
-          const directions: any = document.createElement("ol");
-          directions.classList = "esri-widget esri-widget--panel esri-directions__scroller";
-          directions.style.marginTop = "0";
+
+      const directionsContainer = document.createElement("div");
+      directionsContainer.className = "esri-widget esri-widget--panel";
+      //directionsContainer.style.position = "absolute";
+      directionsContainer.style.bottom = "10px";
+      directionsContainer.style.right = "10px"; 
+      // directionsContainer.style.bottom = "200px"; 
+
+          const directions: any = document.createElement("div");
+          directions.className = "esri-directions__scroller";
+          // directions.style.padding = "200px";
+          // directions.style.overflowY = "auto";
+          // directions.style.marginTop = "0";
           directions.style.padding = "15px 15px 15px 30px";
           const features = data.routeResults[0].directions.features;
 
@@ -694,10 +705,26 @@ export class EsriMapComponent implements OnInit, OnDestroy {
             directions.appendChild(direction);
           });
 
+          const closeButton = document.createElement("button");
+      // closeButton.innerHTML = "X";
+      closeButton.className = "esri-widget-button esri-icon-close";
+      closeButton.style.backgroundColor = "red";
+      closeButton.style.position = "absolute";
+      closeButton.style.right = "0px";
+      // closeButton.style.left = "50 px";
+      closeButton.onclick = () => {
+        // this.view.ui.remove(directions);
+        directionsContainer.remove();
+        this.view.graphics.removeAll();
+      };
+      // directionsContainer.appendChild(directions);
+      directionsContainer.appendChild(closeButton);
+      directionsContainer.appendChild(directions);
+
           sum = sum * 1.609344;
           console.log('dist (km) = ', sum);
           //this.view.ui.empty("top-right");
-          this.view.ui.add(directions, "bottom-right");
+          this.view.ui.add(directionsContainer, "bottom-right");
         }
       }).catch((error: any) => {
         console.log(error);
