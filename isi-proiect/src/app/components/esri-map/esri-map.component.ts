@@ -163,7 +163,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
     this.view.ui.add(this.searchWidget, "top-right");
   }
 
-  addFeatureLayer(): void 
+  addFeatureLayer(): void  {
 
 
     const getToLocationAction = new ActionButton({
