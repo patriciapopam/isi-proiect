@@ -49,21 +49,4 @@ export class FirebaseService {
    
   }
 
-  addPointItem(lat: number, lng: number) {
-      let item: ITestItem = {
-          name: "test",
-          lat: lat,
-          lng: lng
-      };
-      this.db.list('list').push(item);
-  }
-
-  syncPointItem(lat: number, lng: number) {
-      let item: ITestItem = {
-          name: "test",
-          lat: lat,
-          lng: lng
-      };
-      this.db.object('obj').set([item]);
-  }
 }

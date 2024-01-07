@@ -99,6 +99,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
     this.view.ui.add(this.searchWidget, "top-right");
   }
 
+  
   addFeatureLayer(): void {
     const popupSection = {
       "title": "Secție de Votare",
@@ -118,13 +119,14 @@ export class EsriMapComponent implements OnInit, OnDestroy {
     this.featureLayer = layer;
   }
 
-  updateAllPoints(places: any[]): void {
+  updateArcgisFeatureLayer(places: any[]): void {
     for (let place of places) {
-      this.updateFeatureLayer(place.id, place.current_no_votants, place.total_votes);
+      this.updateFeatureLayerElement(place.id, place.current_no_votants, place.total_votes);
     }
   }
 
-  updateFeatureLayer(id: number, no_of_votants: number, new_votes: number): void {
+  /* Updates one element, by id, from argcis feature layer*/
+  updateFeatureLayerElement(id: number, no_of_votants: number, new_votes: number): void {
     const feature = new Graphic({
       attributes: {
         OBJECTID: id,
@@ -174,10 +176,10 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       this.search();
       this.addFeatureLayer();
       this.connectFirebase();
-
+      // Listen to firebase changes and update Arcgis remote feature layer
       this.fbs.getFeedPlaces().subscribe(data => {
         console.log(data);
-        this.updateAllPoints(data);
+        this.updateArcgisFeatureLayer(data);
       });
     });
 
