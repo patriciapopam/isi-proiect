@@ -18,11 +18,8 @@ import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer';
 import Graphic from '@arcgis/core/Graphic';
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils";
 
-import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
 import PopupTemplate from "@arcgis/core/PopupTemplate.js";
 import ActionButton from "@arcgis/core/support/actions/ActionButton.js";
-import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
-import Graphic from '@arcgis/core/Graphic';
 import SimpleRenderer from '@arcgis/core/renderers/SimpleRenderer.js';
 import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol.js";
 import Color from "@arcgis/core/Color.js";
@@ -92,7 +89,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
 
       this.view = new MapView(mapViewProperties);
 
-      this.addFeatureLayers();
+      this.featureLayer();
 
       this.searchWidget = new Search({ view: this.view });
       this.view.ui.add(this.searchWidget, "top-right");
