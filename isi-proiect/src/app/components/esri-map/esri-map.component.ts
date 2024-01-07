@@ -150,6 +150,8 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       });
       this.view.ui.add(this.locate, "top-left");
 
+      this.addPoint(44.5, 26.02);
+
 
         this.view.on("click", (event: any) => {
       this.view.hitTest(event)
@@ -232,7 +234,8 @@ export class EsriMapComponent implements OnInit, OnDestroy {
     console.log("ceva");
     if (event.action.id === "getToLocation") {
       //this.addPoint(44.5, 26.02);
-      this.getRoute();
+      this.addRoute();
+      // this.getRoute();
       event
       //console.log(event.targe.content.graphic.attributes)
       //console.log(this.view.popup.selectedFeature.attributes);
@@ -252,6 +255,12 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       // console.log(this.view.popup.features);
       // console.log(this.view.popup.selectedFeatureWidget);
     }
+    else if(event.action.id === "aux") {
+      console.log("intrare aux");
+      this.searchWidget.on("select-result", (event: any) => {
+        console.log("am ajuns");
+      });
+    }
 });
   }
 
@@ -263,11 +272,18 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       //type: "button"
       //image: "Measure_Distance16.png"
     });
+
+    const auxAction = new ActionButton({
+      title: "aux",
+      id: "aux",
+      //type: "button"
+      //image: "Measure_Distance16.png"
+    });
     
     const popupVotingCenters = new PopupTemplate ({
       // autocasts as new PopupTemplate()
       //actions: [measureThisAction],
-      actions: [getToLocationAction],
+      actions: [getToLocationAction, auxAction],
       title: "Voting Center",
       content: "{name}, {address}, {longitude}, {latitude}",
     });
@@ -445,6 +461,93 @@ export class EsriMapComponent implements OnInit, OnDestroy {
     //   this.view.graphics.add(graphic);
     // }
 
+    addRoute() {
+
+      var addGraphic = (type: any, point: any) => {
+        const graphic = new Graphic({
+          symbol: {
+            type: "simple-marker",
+            color: (type === "origin") ? "white" : "black",
+            size: "8px"
+          } as any,
+          geometry: point
+        });
+        this.view.graphics.add(graphic);
+      }
+      if (this.view.graphics.length === 3) {
+        // console.log("dubidubi");
+        console.log("2 pct si ruta");
+        this.view.graphics.pop();
+        this.view.graphics.pop();
+        addGraphic("destination", this.votingCenterGraphic.geometry);
+        this.getRoute();
+      }
+      else if (this.view.graphics.length === 1) {
+        // let pt = new Point({
+        // longitude: 26.02,
+        // latitude: 44.5
+        // });
+        // let g = new Point(this.votingCenterGraphic.geometry);
+        // g.latitude = g.latitude + 0.02;
+        // g.longitude = g.longitude + 0.03;
+      //   const trackSymbol = {
+      //   type: "simple-marker",
+      //           size: "12px",
+      //           color: "green",
+      //           outline: {
+      //             color: "#efefef",
+      //             width: "1.5px"
+      // }};
+  
+      // //   let track = new Track({
+      // //       view: this.view,
+      // //       graphic: new Graphic({
+      // //         symbol: trackSymbol
+      // //       }),
+      // //       useHeadingEnabled: false
+      // //     });
+        
+      // //   this.view.ui.add(track, "top-left");
+      //   // track.start();
+  
+      //   const locate = new Locate({
+      //       view: this.view,
+      //             graphic: new Graphic({
+      //         symbol: trackSymbol
+      //       }),
+      //   });
+      //   this.view.ui.add(locate, "top-left");
+        //addGraphic("origin", track.graphic.geometry);
+        addGraphic("destination", this.votingCenterGraphic.geometry);
+        console.log("branch 1");
+        console.log(this.view.graphics.length);
+        this.getRoute();
+        // console.log(track.graphic);
+        // console.log(this.view.graphics.at(0).geometry === g);
+        //console.log(this.view.graphics.at(1).geometry === this.votingCenterGraphic.geometry);
+  
+      }
+      // else if (this.view.graphics.length === 4) {
+      //     console.log("1 pct dupa ruta");
+      //     let origin = this.view.graphics.pop();
+      //     this.view.graphics.removeAll();
+      //     this.view.graphics.push(origin);
+      //     addGraphic("destination", this.votingCenterGraphic.geometry);
+      // }
+      else if (this.view.graphics.length === 0) {
+        console.log("automat de la geolocatie");
+        this.locate.locate().then(()=>{
+          addGraphic("destination", this.votingCenterGraphic.geometry);
+          this.getRoute();
+        })
+      }
+      else {
+        console.log("sterge tot");
+          this.view.graphics.removeAll();
+      }
+  
+    }
+
     getRoute() {
 
       console.log("fbuburbgurgbur");
@@ -452,17 +555,17 @@ export class EsriMapComponent implements OnInit, OnDestroy {
 
       const routeUrl = "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
 
-      var addGraphic = (type: any, point: any) => {
-      const graphic = new Graphic({
-        symbol: {
-          type: "simple-marker",
-          color: (type === "origin") ? "white" : "black",
-          size: "8px"
-        } as any,
-        geometry: point
-      });
-      this.view.graphics.add(graphic);
-    }
+    //   var addGraphic = (type: any, point: any) => {
+    //   const graphic = new Graphic({
+    //     symbol: {
+    //       type: "simple-marker",
+    //       color: (type === "origin") ? "white" : "black",
+    //       size: "8px"
+    //     } as any,
+    //     geometry: point
+    //   });
+    //   this.view.graphics.add(graphic);
+    // }
 
     //addGraphic("origin", this.searchResGraphic.geometry);
 
@@ -478,74 +581,74 @@ export class EsriMapComponent implements OnInit, OnDestroy {
 
     console.log(this.view.graphics.length);
     //console.log(this.view.graphics.at(0).geometry == this.searchResGraphic.geometry);
-    if (this.view.graphics.length === 3) {
-      // console.log("dubidubi");
-      console.log("2 pct si ruta");
-      this.view.graphics.pop();
-      this.view.graphics.pop();
-      addGraphic("destination", this.votingCenterGraphic.geometry);
-    }
-    else if (this.view.graphics.length === 1) {
-      // let pt = new Point({
-      // longitude: 26.02,
-      // latitude: 44.5
-      // });
-      // let g = new Point(this.votingCenterGraphic.geometry);
-      // g.latitude = g.latitude + 0.02;
-      // g.longitude = g.longitude + 0.03;
-    //   const trackSymbol = {
-    //   type: "simple-marker",
-    //           size: "12px",
-    //           color: "green",
-    //           outline: {
-    //             color: "#efefef",
-    //             width: "1.5px"
-    // }};
+    // if (this.view.graphics.length === 3) {
+    //   // console.log("dubidubi");
+    //   console.log("2 pct si ruta");
+    //   this.view.graphics.pop();
+    //   this.view.graphics.pop();
+    //   addGraphic("destination", this.votingCenterGraphic.geometry);
+    // }
+    // else if (this.view.graphics.length === 1) {
+    //   // let pt = new Point({
+    //   // longitude: 26.02,
+    //   // latitude: 44.5
+    //   // });
+    //   // let g = new Point(this.votingCenterGraphic.geometry);
+    //   // g.latitude = g.latitude + 0.02;
+    //   // g.longitude = g.longitude + 0.03;
+    // //   const trackSymbol = {
+    // //   type: "simple-marker",
+    // //           size: "12px",
+    // //           color: "green",
+    // //           outline: {
+    // //             color: "#efefef",
+    // //             width: "1.5px"
+    // // }};
 
-    // //   let track = new Track({
+    // // //   let track = new Track({
+    // // //       view: this.view,
+    // // //       graphic: new Graphic({
+    // // //         symbol: trackSymbol
+    // // //       }),
+    // // //       useHeadingEnabled: false
+    // // //     });
+      
+    // // //   this.view.ui.add(track, "top-left");
+    // //   // track.start();
+
+    // //   const locate = new Locate({
     // //       view: this.view,
-    // //       graphic: new Graphic({
+    // //             graphic: new Graphic({
     // //         symbol: trackSymbol
     // //       }),
-    // //       useHeadingEnabled: false
-    // //     });
-      
-    // //   this.view.ui.add(track, "top-left");
-    //   // track.start();
+    // //   });
+    // //   this.view.ui.add(locate, "top-left");
+    //   //addGraphic("origin", track.graphic.geometry);
+    //   addGraphic("destination", this.votingCenterGraphic.geometry);
+    //   console.log("branch 1");
+    //   console.log(this.view.graphics.length);
+    //   // console.log(track.graphic);
+    //   // console.log(this.view.graphics.at(0).geometry === g);
+    //   //console.log(this.view.graphics.at(1).geometry === this.votingCenterGraphic.geometry);
 
-    //   const locate = new Locate({
-    //       view: this.view,
-    //             graphic: new Graphic({
-    //         symbol: trackSymbol
-    //       }),
-    //   });
-    //   this.view.ui.add(locate, "top-left");
-      //addGraphic("origin", track.graphic.geometry);
-      addGraphic("destination", this.votingCenterGraphic.geometry);
-      console.log("branch 1");
-      console.log(this.view.graphics.length);
-      // console.log(track.graphic);
-      // console.log(this.view.graphics.at(0).geometry === g);
-      //console.log(this.view.graphics.at(1).geometry === this.votingCenterGraphic.geometry);
-
-    }
-    else if (this.view.graphics.length === 4) {
-        console.log("1 pct dupa ruta");
-        let origin = this.view.graphics.pop();
-        this.view.graphics.removeAll();
-        this.view.graphics.push(origin);
-        addGraphic("destination", this.votingCenterGraphic.geometry);
-    }
-    else if (this.view.graphics.length === 0) {
-      console.log("automat de la geolocatie");
-      this.locate.locate().then(()=>{
-        addGraphic("destination", this.votingCenterGraphic.geometry);
-      })
-    }
-    else {
-      console.log("sterge tot");
-        this.view.graphics.removeAll();
-    }
+    // }
+    // else if (this.view.graphics.length === 4) {
+    //     console.log("1 pct dupa ruta");
+    //     let origin = this.view.graphics.pop();
+    //     this.view.graphics.removeAll();
+    //     this.view.graphics.push(origin);
+    //     addGraphic("destination", this.votingCenterGraphic.geometry);
+    // }
+    // else if (this.view.graphics.length === 0) {
+    //   console.log("automat de la geolocatie");
+    //   this.locate.locate().then(()=>{
+    //     addGraphic("destination", this.votingCenterGraphic.geometry);
+    //   })
+    // }
+    // else {
+    //   console.log("sterge tot");
+    //     this.view.graphics.removeAll();
+    // }
 
     //addGraphic("destination", this.votingCenterGraphic.geometry);
 
