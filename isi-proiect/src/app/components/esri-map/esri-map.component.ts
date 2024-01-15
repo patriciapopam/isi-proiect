@@ -9,6 +9,8 @@ import {
   Query,
 } from "@angular/core";
 
+import { Subscription } from "rxjs";
+
 import Config from '@arcgis/core/config';
 import Search from '@arcgis/core/widgets/Search';
 import WebMap from '@arcgis/core/WebMap';
@@ -16,8 +18,6 @@ import MapView from '@arcgis/core/views/MapView';
 import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
 import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer';
 import Graphic from '@arcgis/core/Graphic';
-import * as reactiveUtils from "@arcgis/core/core/reactiveUtils";
-
 import PopupTemplate from "@arcgis/core/PopupTemplate.js";
 import ActionButton from "@arcgis/core/support/actions/ActionButton.js";
 import SimpleRenderer from '@arcgis/core/renderers/SimpleRenderer.js';
@@ -27,10 +27,10 @@ import FeatureSet from '@arcgis/core/rest/support/FeatureSet';
 import RouteParameters from '@arcgis/core/rest/support/RouteParameters';
 import * as route from "@arcgis/core/rest/route.js";
 import Locate from "@arcgis/core/widgets/Locate.js";
-
-import Point from '@arcgis/core/geometry/Point';
 import * as locator from "@arcgis/core/rest/locator.js";
-import { Subscription } from "rxjs";
+import * as reactiveUtils from "@arcgis/core/core/reactiveUtils";
+
+
 import { FirebaseService} from "src/app/shared/services/database/firebase.service";
 
 
@@ -72,10 +72,6 @@ export class EsriMapComponent implements OnInit, OnDestroy {
   timeoutHandler = null;
   voting_places_number: number = 41;
 
-  // firebase sync
-  subscriptionList!: Subscription;
-  subscriptionObj!: Subscription;
-
   constructor(
     private fbs: FirebaseService,
   ) { }
@@ -92,7 +88,6 @@ export class EsriMapComponent implements OnInit, OnDestroy {
 
       this.map = new WebMap(mapProperties);
       
-
       const mapViewProperties = {
         container: this.mapViewEl.nativeElement,
         center: this.center,
@@ -164,8 +159,6 @@ export class EsriMapComponent implements OnInit, OnDestroy {
   }
 
   addFeatureLayer(): void  {
-
-
     const getToLocationAction = new ActionButton({
       title: "Generează ruta",
       id: "getToLocation",

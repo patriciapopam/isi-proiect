@@ -1,50 +1,30 @@
-<div class="displayTable">
-    <div class="displayTableCell">
-      <div class="authBlock">
-        <h3>Sign In</h3>
-        <div class="formGroup">
-          <input
-            type="text"
-            class="formControl"
-            placeholder="Username"
-            #userName
-            required
-          />
-        </div>
-        <div class="formGroup">
-          <input
-            type="password"
-            class="formControl"
-            placeholder="Password"
-            #userPassword
-            required
-          />
-        </div>
-        <!-- Calling SignIn Api from AuthService -->
-        <div class="formGroup">
-          <input
-            type="button"
-            class="btn btnPrimary"
-            value="Log in"
-            (click)="authService.SignIn(userName.value, userPassword.value)"
-          />
-        </div>
-        <div class="formGroup">
-          <span class="or"><span class="orInner">Or</span></span>
-        </div>
-        <div class="forgotPassword">
-          <span routerLink="/forgot-password">Forgot Password?</span>
-        </div>
-      </div>
-      <div class="redirectToLogin">
-        <span
-          >Don't have an account?<span
-            class="redirect"
-            routerLink="/register-user"
-          >
-            Sign Up</span
-          ></span
-        >
-      </div>
-    </div>
-  </div>
+<!--(click)="authService.SignIn(userName.value, userPassword.value)-->
+<!--
+<div style="background-color: '#3F51B5'; height: 100vh; width: 100vw; display: flex; justify-content: center; align-items: center; flex-direction: column;"> -->
+
+<img src="assets/iVot_logo.png" style="max-width: 10%;   margin-left: auto;
+margin-right: auto;
+width: 50%; display: block;">
+
+<mat-card class="login-card">
+  <mat-card-header>
+    <mat-card-title>Login</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <!-- Add your login form here -->
+    <form (ngSubmit)="authService.SignIn(username, password)">
+      <mat-form-field>
+        <input matInput placeholder="Username" [(ngModel)]="username" name="username" required>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput type="password" placeholder="Password" [(ngModel)]="password" name="password" required>
+      </mat-form-field>
+      <button mat-raised-button style="position: relative;" color="primary" type="submit">Login</button>
+    </form>
+  </mat-card-content>
+  <a routerLink="/forgot-password" style="font-style: italic; color: '#3F51B5'; font-size: 12px">Forgot your password?</a>
+</mat-card>
+
+<div class="login-card-footer"> 
+<p class="login-card-footer-text">Don't have an account? <a routerLink="/sign-up" class="login-card-footer-text-link">Register here</a></p>
+</div>

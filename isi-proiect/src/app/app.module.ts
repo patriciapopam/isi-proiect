@@ -4,6 +4,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
+import { provideAnimations } from '@angular/platform-browser/animations';
+
 
 import { AngularFireModule } from '@angular/fire/compat';
 
@@ -26,12 +28,14 @@ import {
 
 import { MatInputModule } from '@angular/material/input';
 import { MatRippleModule } from '@angular/material/core';
-import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { HomepageComponent } from './components/homepage/homepage.component';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
 
 import { EsriMapComponent } from './components/esri-map/esri-map.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -61,6 +65,8 @@ import { EsriMapComponent } from './components/esri-map/esri-map.component';
     MatRippleModule,
     MatToolbarModule,
     MatIconModule,
+    MatCardModule,
+    FormsModule,
   ],
   exports: [
     MatButtonModule,
@@ -68,7 +74,9 @@ import { EsriMapComponent } from './components/esri-map/esri-map.component';
     MatInputModule,
     MatRippleModule,
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [provideAnimations()],
+  bootstrap: [AppComponent],
 })
+
+
 export class AppModule { }
