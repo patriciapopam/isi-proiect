@@ -135,6 +135,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
     });
 
       this.handlePopup();
+      this.addBestRouteButton();
 
       await this.view.when(); // wait for map to load
       console.log("ArcGIS map loaded");
@@ -143,6 +144,22 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       console.log("EsriLoader: ", error);
     }
 
+  }
+
+  addBestRouteButton() {
+    const getBestRouteButton = document.createElement("button");
+    getBestRouteButton.className = "esri-widget-button esri-widget";
+    getBestRouteButton.innerHTML = "Cea mai buna ruta";
+    getBestRouteButton.style.position = "absolute";
+    getBestRouteButton.style.right = "250px";
+    getBestRouteButton.style.width = "100px";
+    getBestRouteButton.style.height = "40px";
+
+    getBestRouteButton.onclick = () => {
+      console.log("cauta");
+    };
+
+    this.view.ui.add(getBestRouteButton, "top-right");
   }
 
   handlePopup() {
