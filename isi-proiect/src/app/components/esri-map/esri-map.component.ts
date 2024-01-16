@@ -29,6 +29,8 @@ import * as route from "@arcgis/core/rest/route.js";
 import Locate from "@arcgis/core/widgets/Locate.js";
 import * as locator from "@arcgis/core/rest/locator.js";
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils";
+import Stop from "@arcgis/core/rest/support/Stop.js";
+import Collection from "@arcgis/core/core/Collection.js";
 
 
 import { FirebaseService} from "src/app/shared/services/database/firebase.service";
@@ -156,11 +158,103 @@ export class EsriMapComponent implements OnInit, OnDestroy {
     getBestRouteButton.style.height = "40px";
 
     getBestRouteButton.onclick = () => {
-      console.log("cauta");
+      this.findBestRoute();
     };
 
     this.view.ui.add(getBestRouteButton, "top-right");
   }
+
+  findBestRoute() {
+
+    this.locate.locate().then(()=>{
+    
+      if (this.routeLayer)
+        this.routeLayer.destroy();
+    
+      this.routeLayer = new GraphicsLayer();
+
+      var query = this.centersLayer.createQuery();
+      query.outFields = ["*"];
+      query.returnGeometry = true;
+
+      this.centersLayer.queryFeatures(query).then((featureSet: { features: string | any[]; }) => {
+          if (featureSet.features.length === 0) {
+            return;
+          }
+
+          const routeUrl = "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
+            
+          const routePromises = [];
+          
+          // Get route to each voting centre
+          for (let i = 0; i < this.voting_places_number; i++) {
+
+            const routeParams = new RouteParameters({
+                  stops: new Collection([new Stop({geometry: this.locate.graphic.geometry}),
+                                    new Stop({geometry: featureSet.features[i].geometry})]),
+                  returnDirections: true,
+                  directionsLanguage: "ro-RO"
+              });
+            
+              const routePromise= route.solve(routeUrl, routeParams).then((data: any) => {
+                  if (data.routeResults.length > 0) 
+                      return [data, featureSet.features[i]];
+                  
+                  return null;
+            }).catch((error: any) => {
+                  console.log(error);
+            });;
+
+            routePromises.push(routePromise);
+          }
+        
+        // After all the routes have been generated, choose the best one
+        // allResults[i][0] - route data
+        // allResults[i][0] - voting centre data
+        Promise.all(routePromises)
+          .then((allResults: any[]) => {
+              let minRouteTime = 1000000;
+              let bestRoute = null;
+              
+              for (let i = 0; i < allResults.length; i++) {
+                
+                let dir = allResults[i][0].routeResults[0].directions;
+                let no_votants = allResults[i][1].attributes.Current_no_votants;
+                
+                // We assume that a votant spends 5 minutes at the voting centre
+                if (dir.totalTime + 5 * no_votants < minRouteTime) {
+                  minRouteTime = dir.totalTime + 5 * no_votants;
+                  bestRoute = allResults[i][0];
+                }
+
+                console.log(allResults[i][1].attributes.Name);
+                console.log(dir.totalTime + 5 * no_votants);
+              
+              }
+
+              for (let result of bestRoute.routeResults) {
+                result.route.symbol = {
+                  type: "simple-line",
+                  color: [5, 150, 255],
+                  width: 3
+                };
+                this.routeLayer.add(result.route);
+              }
+      
+              this.map.add(this.routeLayer);
+
+              this.displayDirections(bestRoute);
+
+        })
+        .catch((error) => {
+          // Handle errors
+          console.error("Error in route.solve:", error);
+        });
+
+      });
+    });
+  }
+
 
   handlePopup() {
     reactiveUtils.on(() => this.view.popup, "trigger-action", (event) => {
@@ -313,52 +407,58 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       this.map.add(this.routeLayer);
 
       // Display directions
-      if (data.routeResults.length > 0) {
+      this.displayDirections(data);
 
-        const directionsContainer = document.createElement("div");
-        directionsContainer.className = "esri-widget esri-widget--panel";
-        directionsContainer.style.bottom = "10px";
-        directionsContainer.style.right = "10px"; 
-
-        const directions: any = document.createElement("div");
-        directions.className = "esri-directions__scroller";
-        directions.style.padding = "15px 15px 15px 30px";
-        const features = data.routeResults[0].directions.features;
-
-        // Show each direction
-        features.forEach((result: any, i: any) => {
-          const direction = document.createElement("li");
-          let km = result.attributes.length * 1.609344;
-          
-          if (km < 1)
-            direction.innerHTML = result.attributes.text + " (" + Math.round(km * 1000) + " m)";
-          else
-            direction.innerHTML = result.attributes.text + " (" + Math.round(km) + " Km)";
-          
-          directions.appendChild(direction);
-        });
-
-        const closeButton = document.createElement("button");
-        closeButton.className = "esri-widget-button esri-icon-close";
-        closeButton.style.backgroundColor = "red";
-        closeButton.style.position = "absolute";
-        closeButton.style.right = "0px";
-
-        closeButton.onclick = () => {
-          directionsContainer.remove();
-          this.routeLayer.destroy();
-        };
-
-        directionsContainer.appendChild(closeButton);
-        directionsContainer.appendChild(directions);
-
-        this.view.ui.empty("bottom-right");
-        this.view.ui.add(directionsContainer, "bottom-right");
-      }
     }).catch((error: any) => {
       console.log(error);
     });
   }
+
+  displayDirections(data : any) {
+    if (data.routeResults.length > 0) {
+
+      const directionsContainer = document.createElement("div");
+      directionsContainer.className = "esri-widget esri-widget--panel";
+      directionsContainer.style.bottom = "10px";
+      directionsContainer.style.right = "10px"; 
+
+      const directions: any = document.createElement("div");
+      directions.className = "esri-directions__scroller";
+      directions.style.padding = "15px 15px 15px 30px";
+      const features = data.routeResults[0].directions.features;
+
+      // Show each direction
+      features.forEach((result: any, i: any) => {
+        const direction = document.createElement("li");
+        let km = result.attributes.length * 1.609344;
+        
+        if (km < 1)
+          direction.innerHTML = result.attributes.text + " (" + Math.round(km * 1000) + " m)";
+        else
+          direction.innerHTML = result.attributes.text + " (" + Math.round(km) + " Km)";
+        
+        directions.appendChild(direction);
+      });
+
+      const closeButton = document.createElement("button");
+      closeButton.className = "esri-widget-button esri-icon-close";
+      closeButton.style.backgroundColor = "red";
+      closeButton.style.position = "absolute";
+      closeButton.style.right = "0px";
+
+      closeButton.onclick = () => {
+        directionsContainer.remove();
+        this.routeLayer.destroy();
+      };
+
+      directionsContainer.appendChild(closeButton);
+      directionsContainer.appendChild(directions);
+
+      this.view.ui.empty("bottom-right");
+      this.view.ui.add(directionsContainer, "bottom-right");
+    }
+  }
+
     
 
 
