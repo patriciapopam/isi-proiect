@@ -151,7 +151,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
   addBestRouteButton() {
     const getBestRouteButton = document.createElement("button");
     getBestRouteButton.className = "esri-widget-button esri-widget";
-    getBestRouteButton.innerHTML = "Cea mai buna ruta";
+    getBestRouteButton.innerHTML = "Cea mai bună rută";
     getBestRouteButton.style.position = "absolute";
     getBestRouteButton.style.right = "250px";
     getBestRouteButton.style.width = "100px";
