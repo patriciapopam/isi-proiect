@@ -88,8 +88,10 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       };
 
       //Config.apiKey = "AAPKd74389863643403b89ce87e1504d639awQCjsgObn5bWJAbaVzD76umKlUIMdq45IrxoG3rf2ZdDupjUIsNZRZBSqOSGa8Dw";
-      Config.apiKey = "AAPKe431e50129804cc199e716062b45d9afTrhxbDpgvNhl-h49-T-nfBacoQRLwnW4iuBiCg9u3JD-ntXpGxKzCI7M_i7Q9RSJ";
+      //Config.apiKey = "AAPKe431e50129804cc199e716062b45d9afTrhxbDpgvNhl-h49-T-nfBacoQRLwnW4iuBiCg9u3JD-ntXpGxKzCI7M_i7Q9RSJ";
       //Config.apiKey = "AAPK675199c30ad74b75a1c18cb1f33bac10zmARCb4N6A3ck9SvUrku5tnVYtm34vZOEtxf_cpnLNgIH5ASWBZ4XU4MpdvnEUqX";
+
+      Config.apiKey = "AAPK675199c30ad74b75a1c18cb1f33bac10zmARCb4N6A3ck9SvUrku5tnVYtm34vZOEtxf_cpnLNgIH5ASWBZ4XU4MpdvnEUqX"
 
       this.map = new WebMap(mapProperties);
       
@@ -317,7 +319,8 @@ export class EsriMapComponent implements OnInit, OnDestroy {
 
     const layer = new FeatureLayer({
       portalItem: {
-        id: "e92675ecf74e4159ac2bd21cd8629aad"
+        //id: "e92675ecf74e4159ac2bd21cd8629aad"
+        id: "9b707dc6a20b4a0d9032b4cc93b15d94"
       },
       outFields: ["Name", "Address", "total_no_votes", "Current_no_votants"],
       renderer: new SimpleRenderer({
@@ -409,7 +412,8 @@ export class EsriMapComponent implements OnInit, OnDestroy {
 
     const layer = new FeatureLayer({
         portalItem: {
-          id: "e92675ecf74e4159ac2bd21cd8629aad"
+          //id: "e92675ecf74e4159ac2bd21cd8629aad"
+          id: "9b707dc6a20b4a0d9032b4cc93b15d94"
         },
         outFields: ["Name", "Address", "Current_no_votants"],
         popupTemplate: popupSection,
@@ -585,8 +589,11 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       this.connectFirebase();
       // Listen to firebase changes and update Arcgis remote feature layer
       this.fbs.getFeedPlaces().subscribe(data => {
-        if (this.displayMode === "statistics")
+        //if (this.displayMode === "statistics") {
+         console.timeLog("HELLO");
+        
           this.updateArcgisFeatureLayer(data);
+        //}
       });
     });
 
