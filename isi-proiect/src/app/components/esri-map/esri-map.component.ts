@@ -265,9 +265,6 @@ export class EsriMapComponent implements OnInit, OnDestroy {
                   minRouteTime = dir.totalTime + 5 * no_votants;
                   bestRoute = allResults[i][0];
                 }
-
-                console.log(allResults[i][1].attributes.Name);
-                console.log(dir.totalTime + 5 * no_votants);
               
               }
 
@@ -610,9 +607,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
 
       // Listen to firebase changes and update Arcgis remote feature layer
       this.fbs.getFeedPlaces().subscribe(data => {
-        if (this.displayMode === "statistics") {
-         console.timeLog("HELLO");
-        
+        if (this.displayMode === "places") {
           this.updateArcgisFeatureLayer(data);
         }
       });

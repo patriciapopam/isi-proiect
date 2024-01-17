@@ -53,17 +53,14 @@ export class DashboardComponent implements OnInit, DoCheck {
     this.fb.getFeedPlaces().subscribe((places: any[]) => {
       this.previousVotesValue = this.totalVotes;
       this.totalVotes = this.calculateTotalVotes(places);
-      console.log(this.previousVotesValue, this.totalVotes);
       this.displayVotesValue = this.previousVotesValue;
 
       this.previousPeopleValue = this.totalPeople;
       this.totalPeople = this.calculateTotalPeople(places);
-      console.log(this.previousPeopleValue, this.totalPeople);
       this.displayPeopleValue = this.previousPeopleValue;
 
       this.previousPercentageVoted = this.percentageVoted;
       this.percentageVoted = this.calculatePercentageVoted();
-      console.log(this.previousPercentageVoted, this.percentageVoted);
       this.displayPercentageVoted = this.previousPercentageVoted;
     });
     
@@ -111,8 +108,6 @@ export class DashboardComponent implements OnInit, DoCheck {
 
     const interval = setInterval(() => {
       currentFrame++;
-      console.log(currentFrame);
-      console.log(this.displayVotesValue);
       if (currentFrame === frameCount) {
         clearInterval(interval);
         this.displayVotesValue = endValue;
@@ -121,7 +116,6 @@ export class DashboardComponent implements OnInit, DoCheck {
         this.displayVotesValue = startValue + increment * currentFrame;
       }
     }, frameDuration);
-    console.log(this.displayVotesValue, this.previousVotesValue, this.totalVotes);
     this.displayVotesValue = this.totalVotes;
     this.animationStateVotes = 'start';
   }
@@ -141,8 +135,6 @@ export class DashboardComponent implements OnInit, DoCheck {
 
     const interval = setInterval(() => {
       currentFrame++;
-      console.log(currentFrame);
-      console.log(this.displayPeopleValue);
       if (currentFrame === frameCount) {
         clearInterval(interval);
         this.displayPeopleValue = endValue;
@@ -151,7 +143,6 @@ export class DashboardComponent implements OnInit, DoCheck {
         this.displayPeopleValue = startValue + increment * currentFrame;
       }
     }, frameDuration);
-    console.log(this.displayPeopleValue, this.previousPeopleValue, this.totalPeople);
     this.displayPeopleValue = this.totalPeople;
     this.animationStatePeople = 'start';
   }
@@ -172,8 +163,6 @@ export class DashboardComponent implements OnInit, DoCheck {
 
     const interval = setInterval(() => {
       currentFrame++;
-      console.log(currentFrame);
-      console.log(this.displayPercentageVoted);
       if (currentFrame === frameCount) {
         clearInterval(interval);
         this.displayPercentageVoted = endValue;
@@ -182,7 +171,6 @@ export class DashboardComponent implements OnInit, DoCheck {
         this.displayPercentageVoted = Number((startValue + increment * currentFrame).toFixed(2));
       }
     }, frameDuration);
-    console.log(this.displayPercentageVoted, this.previousPercentageVoted, this.percentageVoted);
     this.displayPercentageVoted = this.percentageVoted;
     this.animationStatePercentage = 'start';
   }
