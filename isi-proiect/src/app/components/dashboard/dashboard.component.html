@@ -1,0 +1,27 @@
+<div style="width: 50%;">
+<app-homepage></app-homepage>
+<app-esri-map></app-esri-map>
+
+<div class="stats">
+    <div class="stat">
+        <div> % au votat </div>
+        <div [@numberAnimation]="animationStatePercentage" class="animated-number">
+            {{ displayPercentageVoted }}%
+        </div>
+    </div>
+    
+    <div class="stat">
+        <div> Oamenii în secții </div>
+        <div [@numberAnimation]="animationStatePeople" class="animated-number">
+            {{ displayPeopleValue }}
+        </div>
+    </div>
+    
+    <div class="stat">
+        <div> Voturi până acum </div>
+        <div [@numberAnimation]="animationStateVotes" class="animated-number">
+            {{ displayVotesValue }}
+        </div>
+    </div>
+</div>
+</div>

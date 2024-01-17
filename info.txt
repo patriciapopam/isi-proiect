@@ -1,0 +1,16 @@
+api key:
+AAPK675199c30ad74b75a1c18cb1f33bac10zmARCb4N6A3ck9SvUrku5tnVYtm34vZOEtxf_cpnLNgIH5ASWBZ4XU4MpdvnEUqX
+
+url feature layer:
+https://services6.arcgis.com/B4YC1JgDBly0js9x/arcgis/rest/services/sectii/FeatureServer
+
+Item ID:
+9b707dc6a20b4a0d9032b4cc93b15d94
+
+const layer = new FeatureLayer({
+  portalItem: {
+    id: "9b707dc6a20b4a0d9032b4cc93b15d94"
+  }
+});
+
+map.add(layer);

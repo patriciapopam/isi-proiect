@@ -1,0 +1,19 @@
+.login-card {
+    max-width: 400px;
+    margin: auto;
+    margin-top: 30px;
+}
+
+.login-card-footer {
+    margin-top: 15px;
+    max-width: 400px;
+    margin: auto;
+}
+
+mat-form-field {
+    width: 100%;
+}
+
+button {
+    margin-top: 15px;
+}

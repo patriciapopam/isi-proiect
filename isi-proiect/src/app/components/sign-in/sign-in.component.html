@@ -1,0 +1,29 @@
+
+<div style="padding-top: 5%">
+<img src="assets/iVot_logo.png" style="max-width: 12%;   margin-left: auto;
+margin-right: auto; 
+ display: block;">
+
+<mat-card class="login-card">
+  <mat-card-header>
+    <mat-card-title>Login</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <!-- Add your login form here -->
+    <form (ngSubmit)="authService.SignIn(username, password)">
+      <mat-form-field>
+        <input matInput placeholder="Username" [(ngModel)]="username" name="username" required>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput type="password" placeholder="Password" [(ngModel)]="password" name="password" required>
+      </mat-form-field>
+      <button mat-raised-button style="position: relative;" color="primary" type="submit">Login</button>
+    </form>
+  </mat-card-content>
+  <a routerLink="/forgot-password" style="font-style: italic; color: '#3F51B5'; font-size: 12px">Forgot your password?</a>
+</mat-card>
+
+<div class="login-card-footer"> 
+<p class="login-card-footer-text">Don't have an account? <a routerLink="/sign-up" class="login-card-footer-text-link">Register here</a></p>
+</div>
+</div>

@@ -1,0 +1,22 @@
+.animated-number {
+    font-size: 24px;
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+.stats {
+    display: flex;
+    padding-top: 3%;
+}
+
+.stat {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+  }
+
+  :host {
+    display: flex;
+    justify-content: center;
+
+  }
