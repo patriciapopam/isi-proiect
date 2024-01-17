@@ -39,7 +39,11 @@ import {SimpleFillSymbol, SimpleMarkerSymbol} from "@arcgis/core/symbols";
 
 import { MarkerSymbol } from "@arcgis/core/symbols";
 
+import Legend from "@arcgis/core/widgets/Legend";
+
+
 import esri = __esri; // Esri TypeScript Types
+
 
 @Component({
   selector: 'app-esri-map',
@@ -185,12 +189,14 @@ export class EsriMapComponent implements OnInit, OnDestroy {
         changeDisplayModeButton.innerHTML = "Statistici";
         this.clearFeatureLayers();
         this.addFeatureLayer();
+        this.addLegend();
       }
       else {
         this.displayMode = "statistics";
         changeDisplayModeButton.innerHTML = "Secții de votare";
         this.clearFeatureLayers();
         this.addClusterLayer();
+        this.view.ui.empty("bottom-left");
       }
     };
 
@@ -576,6 +582,19 @@ export class EsriMapComponent implements OnInit, OnDestroy {
   }
 
 
+  addLegend() {
+    const legend = new Legend({
+      view: this.view,
+      layerInfos: [
+        {
+          layer: this.featureLayer,
+          title: "Secții de votare"
+        }
+      ]
+    });
+
+    this.view.ui.add(legend, "bottom-left");
+  }
 
   ngOnInit(): void {
     // Initialize MapView and return an instance of MapView
@@ -587,13 +606,15 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       this.search();
       this.addFeatureLayer();
       this.connectFirebase();
+      this.addLegend();
+
       // Listen to firebase changes and update Arcgis remote feature layer
       this.fbs.getFeedPlaces().subscribe(data => {
-        //if (this.displayMode === "statistics") {
+        if (this.displayMode === "statistics") {
          console.timeLog("HELLO");
         
           this.updateArcgisFeatureLayer(data);
-        //}
+        }
       });
     });
 

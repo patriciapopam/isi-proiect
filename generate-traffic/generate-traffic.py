@@ -41,7 +41,7 @@ def get_data_from_database():
 if __name__ == "__main__":
     # Call the function to get data from the database
     i = 0
-    while i < 10:
+    while i < 1000:
         get_data_from_database()
         sleep(5)
         i += 1
