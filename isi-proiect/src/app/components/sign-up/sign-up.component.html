@@ -1,37 +1,23 @@
-
-<div class="register-box">
-  <div>
-  <h3>Sign Up</h3>
-  <p>
-    <mat-form-field appearance="legacy">
-      <mat-label>Email Address</mat-label>
-      <input matInput
-      type="email"
-      class="formControl"
-      placeholder="Email Address"
-      #userEmail
-      required
-    >
-    </mat-form-field>
-  </p>
-
-  <p>
-    <mat-form-field appearance="legacy">
-      <mat-label>Password</mat-label>
-    <input matInput
-            type="password"
-            class="formControl"
-            placeholder="Password"
-            #userPwd
-            required
-            >
-          </mat-form-field>
-  </p>
-
-  <div class="formGroup">
-    <button mat-stroked-button (click)="authService.SignUp(userEmail.value, userPwd.value)">Sign up</button>
-      
-  </div>
-  </div>
+<div style="padding-top: 5%">
+  <img src="assets/iVot_logo.png" style="max-width: 12%;   margin-left: auto;
+  margin-right: auto; 
+   display: block;">
+  
+  <mat-card class="login-card">
+    <mat-card-header>
+      <mat-card-title>Register</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <!-- Add your login form here -->
+      <form (ngSubmit)="SignUp(email.value, userPwd.value, 'ana')">
+        <mat-form-field>
+          <input matInput placeholder="Email Address"  name="email" required #email>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput type="password" placeholder="Password" name="password" required #userPwd>
+        </mat-form-field>
+        <button mat-raised-button style="position: relative;" color="primary" type="submit">Sign Up</button>
+      </form>
+    </mat-card-content>
+  </mat-card>
 </div>
-

@@ -36,6 +36,7 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { EsriMapComponent } from './components/esri-map/esri-map.component';
 import { FormsModule } from '@angular/forms';
+import { MatMenuModule } from '@angular/material/menu';
 
 @NgModule({
   declarations: [
@@ -67,6 +68,7 @@ import { FormsModule } from '@angular/forms';
     MatIconModule,
     MatCardModule,
     FormsModule,
+    MatMenuModule,
   ],
   exports: [
     MatButtonModule,

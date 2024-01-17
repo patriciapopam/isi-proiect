@@ -35,7 +35,9 @@ import Collection from "@arcgis/core/core/Collection.js";
 
 import { FirebaseService} from "src/app/shared/services/database/firebase.service";
 
+import {SimpleFillSymbol, SimpleMarkerSymbol} from "@arcgis/core/symbols";
 
+import { MarkerSymbol } from "@arcgis/core/symbols";
 
 import esri = __esri; // Esri TypeScript Types
 
@@ -65,14 +67,15 @@ export class EsriMapComponent implements OnInit, OnDestroy {
   
   // Attributes
   zoom = 10;
-  center: Array<number> = [26.06, 44.45];
+  center: Array<number> = [26.10, 44.44];
   basemap = "arcgis/navigation";
   loaded = false;
-  pointCoords: number[] = [26.06, 44.45];
+  pointCoords: number[] = [26.10, 44.44];
   dir: number = 0;
   count: number = 0;
   timeoutHandler = null;
   voting_places_number: number = 41;
+  displayMode: string = "places";
 
   constructor(
     private fbs: FirebaseService,
@@ -138,6 +141,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
 
       this.handlePopup();
       this.addBestRouteButton();
+      this.addChangeDisplayModeButton();
 
       await this.view.when(); // wait for map to load
       console.log("ArcGIS map loaded");
@@ -162,6 +166,33 @@ export class EsriMapComponent implements OnInit, OnDestroy {
     };
 
     this.view.ui.add(getBestRouteButton, "top-right");
+  }
+
+  addChangeDisplayModeButton() {
+    const changeDisplayModeButton = document.createElement("button");
+    changeDisplayModeButton.className = "esri-widget-button esri-widget";
+    changeDisplayModeButton.innerHTML = "Statistici";
+    changeDisplayModeButton.style.position = "absolute";
+    changeDisplayModeButton.style.right = "365px";
+    changeDisplayModeButton.style.width = "100px";
+    changeDisplayModeButton.style.height = "40px";
+
+    changeDisplayModeButton.onclick = () => {
+      if (this.displayMode === "statistics") {
+        this.displayMode = "places";
+        changeDisplayModeButton.innerHTML = "Statistici";
+        this.clearFeatureLayers();
+        this.addFeatureLayer();
+      }
+      else {
+        this.displayMode = "statistics";
+        changeDisplayModeButton.innerHTML = "Secții de votare";
+        this.clearFeatureLayers();
+        this.addClusterLayer();
+      }
+    };
+
+    this.view.ui.add(changeDisplayModeButton, "top-right");
   }
 
   findBestRoute() {
@@ -269,7 +300,89 @@ export class EsriMapComponent implements OnInit, OnDestroy {
     this.view.ui.add(this.searchWidget, "top-right");
   }
 
+
+  clearFeatureLayers() {
+    // Get all layers from the map
+    const allLayers = this.map.layers.toArray();
+
+    // Iterate through layers and remove feature layers
+    allLayers.forEach(layer => {
+      if (layer.type === "feature") {
+        this.map.remove(layer);
+      }
+    });
+  }
+
+  addClusterLayer(): void  {
+
+    const layer = new FeatureLayer({
+      portalItem: {
+        id: "e92675ecf74e4159ac2bd21cd8629aad"
+      },
+      outFields: ["Name", "Address", "total_no_votes", "Current_no_votants"],
+      renderer: new SimpleRenderer({
+        symbol: new SimpleMarkerSymbol({
+          style: 'circle',
+          color: [250, 250, 250],
+          outline: {
+            color: [255, 255, 255, 0.5],
+            width: 0.5
+          }}),
+        }
+      ),
+      
+      featureReduction: {
+        type: 'cluster',
+        clusterRadius: "300px",
+          popupTemplate: {
+            title: "Statistici secții de votare",
+            content: "Selectate {cluster_count} secții de votare, cu {expression/cluster_total_no_votes} voturi în total.",
+            fieldInfos: [{
+              fieldName: "cluster_count",
+              format: {
+                places: 0,
+                digitSeparator: true
+              }
+            }
+          ],
+          expressionInfos: [{
+            name: "cluster_total_no_votes",
+            title: "cluster_total_no_votes",
+            expression: `
+              Expects($aggregatedFeatures, "total_no_votes")
+              var cluster_total_no_votes = Sum($aggregatedFeatures, "total_no_votes");
+              return \`\${Text(cluster_total_no_votes)}\`;
+            `
+          }]
+          },
+          clusterMinSize: "24px",
+          clusterMaxSize: "60px",
+          labelingInfo: [{
+            deconflictionStrategy: "none",
+            labelExpressionInfo: {
+              expression: "Text($feature.cluster_count, '#,###')"
+            },
+            symbol: {
+              type: "text",
+              color: "#004a5d",
+              font: {
+                weight: "bold",
+                family: "Noto Sans",
+                size: "20px"
+              }
+            },
+            labelPlacement: "center-center",
+          }]
+      }
+    });
+
+    this.map.add(layer);
+    this.featureLayer = layer;
+    this.centersLayer = layer;
+  }
+
   addFeatureLayer(): void  {
+
     const getToLocationAction = new ActionButton({
       title: "Generează ruta",
       id: "getToLocation",
@@ -281,7 +394,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       title: "Secție de Votare",
       content: "<b>Secție:</b> {Name}<br><b>Adresa:</b> {Address}<br><b>Votanți în secție:</b> {Current_no_votants}"
     });
-
+    
     const rend = new SimpleRenderer({
       symbol: new PictureMarkerSymbol({
         url: "https://static.arcgis.com/images/Symbols/Emergency-Management/Law-Enforcement-Citizen-Complaint.png",  // Provide the path to your image
@@ -293,14 +406,15 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       })
     });
 
+
     const layer = new FeatureLayer({
-      portalItem: {
-        id: "e92675ecf74e4159ac2bd21cd8629aad"
-      },
-      outFields: ["Name", "Address", "Current_no_votants"],
-      popupTemplate: popupSection,
-      renderer: rend
-    });
+        portalItem: {
+          id: "e92675ecf74e4159ac2bd21cd8629aad"
+        },
+        outFields: ["Name", "Address", "Current_no_votants"],
+        popupTemplate: popupSection,
+        renderer: rend,
+      });
     
     this.map.add(layer);
     this.featureLayer = layer;
@@ -311,8 +425,6 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       this.updateFeatureLayerElement(place.id, place.current_no_votants, place.total_votes);
     }
   }
-
-
    
   /* Updates one element, by id, from argcis feature layer*/
   updateFeatureLayerElement(id: number, no_of_votants: number, new_votes: number): void {
@@ -325,7 +437,7 @@ export class EsriMapComponent implements OnInit, OnDestroy {
     });
 
     this.featureLayer.applyEdits({ updateFeatures: [feature] }).then((editsResult) => {
-        console.log(editsResult);
+        //console.log(editsResult);
     });
   }
 
@@ -459,7 +571,6 @@ export class EsriMapComponent implements OnInit, OnDestroy {
     }
   }
 
-    
 
 
   ngOnInit(): void {
@@ -474,8 +585,8 @@ export class EsriMapComponent implements OnInit, OnDestroy {
       this.connectFirebase();
       // Listen to firebase changes and update Arcgis remote feature layer
       this.fbs.getFeedPlaces().subscribe(data => {
-        console.log(data);
-        this.updateArcgisFeatureLayer(data);
+        if (this.displayMode === "statistics")
+          this.updateArcgisFeatureLayer(data);
       });
     });
 

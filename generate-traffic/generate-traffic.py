@@ -1,7 +1,12 @@
+from time import sleep
 import firebase_admin
 from firebase_admin import credentials, db
 from firebase_admin import firestore
 from google.cloud.firestore import FieldFilter
+
+import random
+
+#random_number = random.randint(10, 100)
 
 # Initialize Firebase with your service account key
 cred = credentials.Certificate('../isi-proiect-test-4f0d683034d0.json')
@@ -17,17 +22,26 @@ def get_data_from_database():
     # Get all data under the "places" node
     all_places_data = places_ref.get()
 
-    for place in all_places_data:
-        if all_places_data[place]['name'] == 'COLEGIUL NATIONAL "GHEORGHE LAZAR"':
-            print("Found it!")
-            print(all_places_data[place]['current_no_votants'])
-            all_places_data[place]['current_no_votants'] = all_places_data[place]['current_no_votants'] + 1
-            print(all_places_data[place]['current_no_votants'])
-            places_ref.update({place: all_places_data[place]})
-            print("Updated!")
-    else:
-        print("No data found in the 'places' node.")
+    i = 0
+    picked_place1 = random.randint(0, len(all_places_data) - 1)
+    picked_place2 = random.randint(0, len(all_places_data) - 1)
+    picked_place3 = random.randint(0, len(all_places_data) - 1)
+    picked_place4 = random.randint(0, len(all_places_data) - 1)
+    picked_place5 = random.randint(0, len(all_places_data) - 1)
 
+    for place in all_places_data:
+        if i == picked_place1 or i == picked_place2 or i == picked_place3 or i == picked_place4 or i == picked_place5:
+            print("Picked place: " + place)
+            print(all_places_data[place]['name'] + " " + str(all_places_data[place]['total_votes']) + " " + str(all_places_data[place]['current_no_votants']))
+            all_places_data[place]['current_no_votants'] = random.randint(10, 100)
+            all_places_data[place]['total_votes'] += random.randint(10, 100)
+            places_ref.update({place: all_places_data[place]})
+        i += 1
+        
 if __name__ == "__main__":
     # Call the function to get data from the database
-    get_data_from_database()
+    i = 0
+    while i < 10:
+        get_data_from_database()
+        sleep(5)
+        i += 1

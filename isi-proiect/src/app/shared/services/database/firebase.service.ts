@@ -29,6 +29,25 @@ export class FirebaseService {
     return this.placesFeed;
   }
 
+  getFeedUsers() {
+    return this.usersFeed;
+  }
+
+  addUserItem(id: number, name: string) { 
+    let user = {
+      id: id,
+      name: name
+    };
+    this.usersFeed.subscribe((items: any[]) => {
+      for (let item of items) {
+        if (item.id === id) {
+          return;
+        }
+      }
+      this.db.list('users').push(user);
+    });
+  }
+
   addPlaceItem(id: number, lat: number, lng: number, name: string, total_votes: number, current_no_votants: number) {
     let place = {
       id: id,

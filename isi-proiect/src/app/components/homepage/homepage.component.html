@@ -1,11 +1,15 @@
+<mat-toolbar color="primary">
+  <img height="80%" src="assets/iVot_logo_inverted.png" alt="iVot LOGO" style="padding-left: 2%;">
+  <span class="example-spacer"></span>
+  <button mat-icon-button class="example-icon" [matMenuTriggerFor]="menu">
+    <span>{{userDisplayName}}</span>
+    <mat-icon>account_circle</mat-icon>
+  </button>
+</mat-toolbar>
 
-    <mat-toolbar color="primary">
-      <button mat-icon-button class="example-icon">
-        <mat-icon>menu</mat-icon>
-      </button>
-      <img height="80%" src="assets/iVot_logo_inverted.png" alt="iVot LOGO">
-      <span class="example-spacer"></span>
-      <button mat-icon-button class="example-icon">
-        <mat-icon>account_circle</mat-icon>
-      </button>
-    </mat-toolbar>
+<mat-menu #menu="matMenu">
+  <button mat-menu-item (click)="signOut()">
+    <span>Sign Out</span>
+  </button>
+  
+</mat-menu>
